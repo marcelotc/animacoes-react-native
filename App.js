@@ -12,12 +12,13 @@ import {
 
 const App = () => {
   const [ballY, setBallY] = useState(new Animated.Value(0));
+  const [ballX, setBallX] = useState(new Animated.divide(ballY, 2));
 
   useEffect(() => {
     Animated.decay(ballY, { //Animated.spring
       //toValue: 300,
       //bounciness: 20,
-      velocity: 1,
+      velocity: 0.5,
       useNativeDriver: false,
     }).start()
   }, [])
@@ -27,7 +28,7 @@ const App = () => {
       <View style={styles.container}>
         <Animated.View style={[
           styles.ball,
-          { top: ballY }
+          { top: ballY, left: ballX }
         ]}></Animated.View>
       </View>
     </>
