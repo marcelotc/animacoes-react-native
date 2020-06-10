@@ -14,9 +14,10 @@ const App = () => {
   const [ballY, setBallY] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    Animated.timing(ballY, {
-      toValue: 500,
-      duration: 1000,
+    Animated.decay(ballY, { //Animated.spring
+      //toValue: 300,
+      //bounciness: 20,
+      velocity: 1,
       useNativeDriver: false,
     }).start()
   }, [])
