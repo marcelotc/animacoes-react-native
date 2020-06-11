@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Animated,
-  StyleSheet
+  StyleSheet,
+  PanResponder
 } from 'react-native';
 
 //Animated.View
@@ -11,29 +12,48 @@ import {
 //Animated.ScrollView
 
 const App = () => {
-  const [ballY, setBallY] = useState(new Animated.Value(0));
+  const [ball, setBall] = useState(new Animated.ValueXY({ x: 0, y: 0 }));
 
-  useEffect(() => {
-    Animated.timing(ballY, {
-      toValue: 500,
-      duration: 1000,
-      useNativeDriver: false
-    }).start();
-  }, [])
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (e, gestureState) => true,
+
+    onPanResponderGrant: (e, gestureState) => {
+      ball.setOffset({
+        x: ball.x._value,
+        y: ball.y._value,
+      });
+
+      ball.setValue({ x: 0, y: 0 })
+    },
+
+    onPanResponderMove: Animated.event([null, {
+      dx: ball.x,
+      dy: ball.y
+    }], {
+      listener: (e, gestureState) => {
+        console.log(gestureState)
+      }
+    }),
+
+    onPanResponderRelease: () => {
+      ball.flattenOffset();
+    }
+  })
 
   return (
     <>
       <View style={styles.container}>
-        <Animated.View style={[
-          styles.ball,
-          {
-            top: ballY, opacity: ballY.interpolate({
-              inputRange: [0, 300],
-              outputRange: [1, 0.2],
-              extrapolate: 'clamp'
-            })
-          }
-        ]}></Animated.View>
+        <Animated.View
+          {...panResponder.panHandlers}
+          style={[
+            styles.ball,
+            {
+              transform: [
+                { translateX: ball.x },
+                { translateY: ball.y },
+              ]
+            }
+          ]}></Animated.View>
       </View>
     </>
   );
