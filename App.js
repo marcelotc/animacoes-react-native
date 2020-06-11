@@ -12,15 +12,43 @@ import {
 
 const App = () => {
   const [ballY, setBallY] = useState(new Animated.Value(0));
-  const [ballX, setBallX] = useState(new Animated.divide(ballY, 2));
+  const [ballX, setBallX] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    Animated.decay(ballY, { //Animated.spring
-      //toValue: 300,
-      //bounciness: 20,
-      velocity: 0.5,
-      useNativeDriver: false,
-    }).start()
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(ballY, { //Animated.spring
+          duration: 500,
+          toValue: 200,
+          useNativeDriver: false,
+        }),
+
+        Animated.delay(1000),
+
+        Animated.timing(ballX, {
+          duration: 500,
+          toValue: 200,
+          useNativeDriver: false,
+        }),
+
+        Animated.delay(1000),
+
+        Animated.timing(ballY, {
+          toValue: 0,
+          duration: 500
+        }),
+
+        Animated.delay(1000),
+
+        Animated.timing(ballY, {
+          duration: 500,
+          toValue: 200,
+          useNativeDriver: false,
+        }),
+      ]), {
+      iterations: 2,
+    }
+    ).start()
   }, [])
 
   return (
