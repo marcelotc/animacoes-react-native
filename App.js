@@ -12,43 +12,13 @@ import {
 
 const App = () => {
   const [ballY, setBallY] = useState(new Animated.Value(0));
-  const [ballX, setBallX] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(ballY, { //Animated.spring
-          duration: 500,
-          toValue: 200,
-          useNativeDriver: false,
-        }),
-
-        Animated.delay(1000),
-
-        Animated.timing(ballX, {
-          duration: 500,
-          toValue: 200,
-          useNativeDriver: false,
-        }),
-
-        Animated.delay(1000),
-
-        Animated.timing(ballY, {
-          toValue: 0,
-          duration: 500
-        }),
-
-        Animated.delay(1000),
-
-        Animated.timing(ballY, {
-          duration: 500,
-          toValue: 200,
-          useNativeDriver: false,
-        }),
-      ]), {
-      iterations: 2,
-    }
-    ).start()
+    Animated.timing(ballY, {
+      toValue: 500,
+      duration: 1000,
+      useNativeDriver: false
+    }).start();
   }, [])
 
   return (
@@ -56,7 +26,13 @@ const App = () => {
       <View style={styles.container}>
         <Animated.View style={[
           styles.ball,
-          { top: ballY, left: ballX }
+          {
+            top: ballY, opacity: ballY.interpolate({
+              inputRange: [0, 300],
+              outputRange: [1, 0.2],
+              extrapolate: 'clamp'
+            })
+          }
         ]}></Animated.View>
       </View>
     </>
