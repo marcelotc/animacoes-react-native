@@ -10,16 +10,46 @@ import {
     StyleSheet,
     Dimensions,
     TouchableWithoutFeedback,
-    Animated
+    Animated,
+    PanResponder
 } from "react-native";
 
 import Icon from "react-native-vector-icons/MaterialIcons";
+
+const { width } = Dimensions.get('window')
 
 const User = (props) => {
     const { user } = props
 
     const [offset] = useState(new Animated.ValueXY({ x: 0, y: 50 }));
     const [opacity] = useState(new Animated.Value(0));
+
+    const panResponder = PanResponder.create({
+        onPanResponderTerminationRequest: () => false,
+        onMoveShouldSetPanResponder: () => true,
+
+        onPanResponderMove: Animated.event([null, {
+            dx: offset.x
+        }]),
+
+        onPanResponderRelease: () => {
+            if (offset.x._value < 200) {
+                Alert.alert('Deleted!')
+            }
+
+            Animated.spring(offset.x, {
+                toValue: 0,
+                bounciness: 10,
+            }).start()
+        },
+
+        onPanResponderTerminate: () => {
+            Animated.spring(offset.x, {
+                toValue: 0,
+                bounciness: 10,
+            }).start()
+        }
+    })
 
     useEffect(() => {
         Animated.parallel([
@@ -38,16 +68,26 @@ const User = (props) => {
     }, [])
 
     return (
-        <Animated.View style={[
-            {
-                transform: [
-                    { translateY: offset.y }
-                ]
+        <Animated.View
+            {...panResponder.panHandlers}
 
-                //transform: [...offset.getTranslateTransform()]
-            },
-            { opacity: opacity }
-        ]}>
+            style={[
+                {
+                    transform: [
+                        { translateY: offset.y, },
+                        { translateX: offset.x, },
+                        {
+                            rotateZ: offset.x.interpolate({
+                                inputRange: [width * -1, width],
+                                outputRange: ['-50deg', '50deg']
+                            })
+                        }
+                    ]
+
+                    //transform: [...offset.getTranslateTransform()]
+                },
+                { opacity: opacity }
+            ]}>
             <TouchableWithoutFeedback onPress={props.onPress}>
                 <View style={styles.userContainer}>
                     <Image style={styles.thumbnail} source={{ uri: user.thumbnail }} />
