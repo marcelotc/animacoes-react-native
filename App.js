@@ -1,76 +1,136 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from "react";
+
 import {
   View,
-  Animated,
+  Image,
+  Text,
+  Platform,
+  StatusBar,
   StyleSheet,
-  PanResponder
-} from 'react-native';
+  Dimensions,
+  ScrollView,
+  TouchableOpacity
+} from "react-native";
 
-//Animated.View
-//Animated.Text
-//Animated.Image
-//Animated.ScrollView
+import User from "./components/User";
+import Icon from "react-native-vector-icons/MaterialIcons";
+
+const { width } = Dimensions.get("window");
 
 const App = () => {
-  const [ball, setBall] = useState(new Animated.ValueXY({ x: 0, y: 0 }));
-
-  const panResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: (e, gestureState) => true,
-
-    onPanResponderGrant: (e, gestureState) => {
-      ball.setOffset({
-        x: ball.x._value,
-        y: ball.y._value,
-      });
-
-      ball.setValue({ x: 0, y: 0 })
+  const [userSelected, setUserSelected] = useState(null)
+  const [userInfoVisible, setUserInfoVisible] = useState(false)
+  const [users, setUsers] = useState([
+    {
+      id: 1,
+      name: "Diego Fernandes",
+      description: "Head de programação!",
+      avatar: "https://avatars0.githubusercontent.com/u/2254731?s=460&v=4",
+      thumbnail:
+        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=400&q=80",
+      likes: 200,
+      color: "#57BCBC"
     },
-
-    onPanResponderMove: Animated.event([null, {
-      dx: ball.x,
-      dy: ball.y
-    }], {
-      listener: (e, gestureState) => {
-        console.log(gestureState)
-      }
-    }),
-
-    onPanResponderRelease: () => {
-      ball.flattenOffset();
+    {
+      id: 2,
+      name: "Robson Marques",
+      description: "Head de empreendedorismo!",
+      avatar: "https://avatars2.githubusercontent.com/u/861751?s=460&v=4",
+      thumbnail:
+        "https://images.unsplash.com/photo-1490633874781-1c63cc424610?auto=format&fit=crop&w=400&q=80",
+      likes: 350,
+      color: "#E75A63"
+    },
+    {
+      id: 3,
+      name: "Cleiton Souza",
+      description: "Head de mindset!",
+      avatar: "https://avatars0.githubusercontent.com/u/4669899?s=460&v=4",
+      thumbnail:
+        "https://images.unsplash.com/photo-1506440905961-0ab11f2ed5bc?auto=format&fit=crop&w=400&q=80",
+      likes: 250,
+      color: "#2E93E5"
+    },
+    {
+      id: 4,
+      name: "Robson Marques",
+      description: "Head de empreendedorismo!",
+      avatar: "https://avatars2.githubusercontent.com/u/861751?s=460&v=4",
+      thumbnail:
+        "https://images.unsplash.com/photo-1490633874781-1c63cc424610?auto=format&fit=crop&w=400&q=80",
+      likes: 350,
+      color: "#E75A63"
     }
-  })
+  ])
+
+  const selectUser = user => {
+    setUserSelected(user)
+    setUserInfoVisible(true)
+  };
+
+  const renderDetail = () => (
+    <View>
+      <User user={userSelected} onPress={() => { }} />
+    </View>
+  );
+
+  renderList = () => (
+    <View style={styles.container}>
+      <ScrollView>
+        {users.map(user => (
+          <User
+            key={user.id}
+            user={user}
+            onPress={() => selectUser(user)}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
 
   return (
-    <>
-      <View style={styles.container}>
-        <Animated.View
-          {...panResponder.panHandlers}
-          style={[
-            styles.ball,
-            {
-              transform: [
-                { translateX: ball.x },
-                { translateY: ball.y },
-              ]
-            }
-          ]}></Animated.View>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <View style={styles.header}>
+        <Image
+          style={styles.headerImage}
+          source={userSelected ? { uri: userSelected.thumbnail } : null}
+        />
+        <Text style={styles.headerText}>
+          {userSelected ? userSelected.name : "GoNative"}
+        </Text>
       </View>
-    </>
+      {userInfoVisible ? renderDetail() : renderList()}
+    </View>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1
   },
-  ball: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#f00'
+
+  header: {
+    paddingTop: Platform.OS === "ios" ? 40 : 20,
+    paddingHorizontal: 15,
+    backgroundColor: "#2E93E5",
+    height: 200
+  },
+
+  headerImage: {
+    ...StyleSheet.absoluteFillObject
+  },
+
+  headerText: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#FFF",
+    backgroundColor: "transparent",
+    position: "absolute",
+    left: 15,
+    bottom: 20
   }
-})
+});
 
 export default App;
